@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# © 2015 Eficent Business and IT Consulting Services S.L. -
-# Jordi Ballester Alomar
+# © 2015 Eficent Business and IT Consulting Services S.L.
+# - Jordi Ballester Alomar
 # © 2015 Serpent Consulting Services Pvt. Ltd. - Sudhir Arya
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 from openerp import netsvc
 from openerp.tests import common
 
@@ -25,8 +25,10 @@ class TestSaleOperatingUnit(common.TransactionCase):
         self.payment_model = self.env['sale.advance.payment.inv']
         # Company
         self.company = self.env.ref('base.main_company')
-        self.grp_sale_user = self.env.ref('base.group_sale_manager')
+        self.grp_sale_manager = self.env.ref('base.group_sale_manager')
         self.grp_acc_user = self.env.ref('account.group_account_invoice')
+        # Main warehouse
+        self.wh1 = self.env.ref('stock.warehouse0')
         # Main Operating Unit
         self.ou1 = self.env.ref('operating_unit.main_operating_unit')
         # B2B Operating Unit
@@ -44,21 +46,21 @@ class TestSaleOperatingUnit(common.TransactionCase):
         # Products
         self.product1 = self.env.ref('product.product_product_7')
         # Create user1
-        self.user1 = self._create_user('user_1', [self.grp_sale_user,
+        self.user1 = self._create_user('user_1', [self.grp_sale_manager,
                                                   self.grp_acc_user],
                                        self.company, [self.ou1, self.b2c])
         # Create user2
-        self.user2 = self._create_user('user_2', [self.grp_sale_user,
+        self.user2 = self._create_user('user_2', [self.grp_sale_manager,
                                                   self.grp_acc_user],
                                        self.company, [self.b2c])
         # Create Sale Order1
         self.sale1 = self._create_sale_order(self.user1.id, self.customer,
                                              self.product1, self.pricelist,
-                                             self.ou1)
+                                             self.wh1, self.ou1)
         # Create Sale Order2
         self.sale2 = self._create_sale_order(self.user2.id, self.customer,
                                              self.product1, self.pricelist,
-                                             self.b2c)
+                                             self.wh1, self.b2c)
 
     def _create_user(self, login, groups, company, operating_units,
                      context=None):
@@ -76,7 +78,7 @@ class TestSaleOperatingUnit(common.TransactionCase):
         })
         return user
 
-    def _create_sale_order(self, uid, customer, product, pricelist,
+    def _create_sale_order(self, uid, customer, product, pricelist, warehouse,
                            operating_unit):
         """Create a sale order."""
         sale = self.sale_model.sudo(uid).create({
@@ -94,7 +96,7 @@ class TestSaleOperatingUnit(common.TransactionCase):
         return sale
 
     def _confirm_sale(self, sale):
-        sale.action_button_confirm()
+        sale.action_confirm()
         payment = self.payment_model.create({
             'advance_payment_method': 'all'
         })
