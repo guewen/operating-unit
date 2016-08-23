@@ -44,7 +44,7 @@ class TestSaleOperatingUnit(common.TransactionCase):
         # Partner
         self.partner1 = self.env.ref('base.res_partner_1')
         # Products
-        self.product1 = self.env.ref('product.product_product_7')
+        self.product1 = self.env.ref('product.product_product_0')
         # Create user1
         self.user1 = self._create_user('user_1', [self.grp_sale_manager,
                                                   self.grp_acc_user],
@@ -106,8 +106,8 @@ class TestSaleOperatingUnit(common.TransactionCase):
             'active_model': 'sale.order',
             'open_invoices': True,
         }
-        res = payment.with_context(sale_context).create_invoices()
-        invoice_id = res['res_id']
+        res = sale.action_invoice_create()
+        invoice_id = res[0]
         return invoice_id
 
     def test_security(self):
