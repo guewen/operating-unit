@@ -29,6 +29,8 @@ class TestSaleOperatingUnit(common.TransactionCase):
         self.grp_acc_user = self.env.ref('account.group_account_invoice')
         # Main warehouse
         self.wh1 = self.env.ref('stock.warehouse0')
+        # b2c warehouse
+        self.wh2 = self.env.ref('stock_operating_unit.stock_warehouse_b2c')
         # Main Operating Unit
         self.ou1 = self.env.ref('operating_unit.main_operating_unit')
         # B2B Operating Unit
@@ -44,7 +46,8 @@ class TestSaleOperatingUnit(common.TransactionCase):
         # Partner
         self.partner1 = self.env.ref('base.res_partner_1')
         # Products
-        self.product1 = self.env.ref('product.product_product_0')
+        self.product1 = self.env.ref('product.product_product_7')
+        self.product2 = self._create_product(self.product1)
         # Create user1
         self.user1 = self._create_user('user_1', [self.grp_sale_manager,
                                                   self.grp_acc_user],
@@ -55,12 +58,17 @@ class TestSaleOperatingUnit(common.TransactionCase):
                                        self.company, [self.b2c])
         # Create Sale Order1
         self.sale1 = self._create_sale_order(self.user1.id, self.customer,
-                                             self.product1, self.pricelist,
+                                             self.product2, self.pricelist,
                                              self.wh1, self.ou1)
         # Create Sale Order2
         self.sale2 = self._create_sale_order(self.user2.id, self.customer,
-                                             self.product1, self.pricelist,
-                                             self.wh1, self.b2c)
+                                             self.product2, self.pricelist,
+                                             self.wh2, self.b2c)
+
+    def _create_product(self, product):
+        product2 = product.copy()
+        product2.write({'invoice_policy': 'order'})
+        return product2
 
     def _create_user(self, login, groups, company, operating_units,
                      context=None):
@@ -81,14 +89,15 @@ class TestSaleOperatingUnit(common.TransactionCase):
     def _create_sale_order(self, uid, customer, product, pricelist, warehouse,
                            operating_unit):
         """Create a sale order."""
-        sale = self.sale_model.sudo(uid).create({
+        sale = self.sale_model.create({
             'partner_id': customer.id,
             'partner_invoice_id': customer.id,
             'partner_shipping_id': customer.id,
             'pricelist_id': pricelist.id,
-            'operating_unit_id': operating_unit.id
+            'operating_unit_id': operating_unit.id,
+            'warehouse_id': warehouse.id
         })
-        self.sale_order_model.sudo(uid).create({
+        self.sale_order_model.create({
             'order_id': sale.id,
             'product_id': product.id,
             'name': 'Sale Order Line'
