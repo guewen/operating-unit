@@ -23,20 +23,21 @@ class TestSaleOperatingUnit(common.TransactionCase):
         self.operating_unit_model = self.env['operating.unit']
         self.company_model = self.env['res.company']
         self.payment_model = self.env['sale.advance.payment.inv']
+        self.warehouse_model = self.env['stock.warehouse']
         # Company
         self.company = self.env.ref('base.main_company')
         self.grp_sale_manager = self.env.ref('base.group_sale_manager')
         self.grp_acc_user = self.env.ref('account.group_account_invoice')
-        # Main warehouse
-        self.wh1 = self.env.ref('stock.warehouse0')
-        # b2c warehouse
-        self.wh2 = self.env.ref('stock_operating_unit.stock_warehouse_b2c')
-        # Main Operating Unit
-        self.ou1 = self.env.ref('operating_unit.main_operating_unit')
         # B2B Operating Unit
         self.b2b = self.env.ref('operating_unit.b2b_operating_unit')
         # B2C Operating Unit
         self.b2c = self.env.ref('operating_unit.b2c_operating_unit')
+        # Main warehouse
+        self.wh1 = self.env.ref('stock.warehouse0')
+        # Extra warehouse
+        self.wh2 = self._create_warehouse(self.wh1, self.b2c)
+        # Main Operating Unit
+        self.ou1 = self.env.ref('operating_unit.main_operating_unit')
         # Payment Term
         self.pay = self.env.ref('account.account_payment_term_immediate')
         # Customer
@@ -64,6 +65,14 @@ class TestSaleOperatingUnit(common.TransactionCase):
         self.sale2 = self._create_sale_order(self.user2.id, self.customer,
                                              self.product2, self.pricelist,
                                              self.wh2, self.b2c)
+
+    def _create_warehouse(self, wh, OU):
+        wh2 = self.warehouse_model.create({
+            'name': 'Extra Warehouse',
+            'code': 'XWH',
+            'partner_id': wh.partner_id.id,
+            'operating_unit_id': OU.id})
+        return wh2
 
     def _create_product(self, product):
         product2 = product.copy()
