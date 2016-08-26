@@ -70,6 +70,7 @@ class TestSaleOperatingUnit(common.TransactionCase):
         wh2 = self.warehouse_model.create({
             'name': 'Extra Warehouse',
             'code': 'XWH',
+            'company_id': wh.company_id.id,
             'partner_id': wh.partner_id.id,
             'operating_unit_id': OU.id})
         return wh2
