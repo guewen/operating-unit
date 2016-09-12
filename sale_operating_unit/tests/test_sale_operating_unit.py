@@ -17,13 +17,11 @@ class TestSaleOperatingUnit(common.TransactionCase):
         self.sale_model = self.env['sale.order']
         self.sale_order_model = self.env['sale.order.line']
         self.acc_move_model = self.env['account.move']
-        self.acc_invoice_model = self.env['account.invoice']
         self.res_company_model = self.env['res.company']
         self.product_model = self.env['product.product']
         self.operating_unit_model = self.env['operating.unit']
         self.company_model = self.env['res.company']
         self.payment_model = self.env['sale.advance.payment.inv']
-        self.warehouse_model = self.env['stock.warehouse']
         # Company
         self.company = self.env.ref('base.main_company')
         self.grp_sale_manager = self.env.ref('base.group_sale_manager')
@@ -32,10 +30,6 @@ class TestSaleOperatingUnit(common.TransactionCase):
         self.b2b = self.env.ref('operating_unit.b2b_operating_unit')
         # B2C Operating Unit
         self.b2c = self.env.ref('operating_unit.b2c_operating_unit')
-        # Main warehouse
-        self.wh1 = self.env.ref('stock.warehouse0')
-        # Extra warehouse
-        self.wh2 = self._create_warehouse(self.wh1, self.b2c)
         # Main Operating Unit
         self.ou1 = self.env.ref('operating_unit.main_operating_unit')
         # Payment Term
@@ -60,20 +54,11 @@ class TestSaleOperatingUnit(common.TransactionCase):
         # Create Sale Order1
         self.sale1 = self._create_sale_order(self.user1.id, self.customer,
                                              self.product2, self.pricelist,
-                                             self.wh1, self.ou1)
+                                             self.ou1)
         # Create Sale Order2
         self.sale2 = self._create_sale_order(self.user2.id, self.customer,
                                              self.product2, self.pricelist,
-                                             self.wh2, self.b2c)
-
-    def _create_warehouse(self, wh, OU):
-        wh2 = self.warehouse_model.create({
-            'name': 'Extra Warehouse',
-            'code': 'XWH',
-            'company_id': wh.company_id.id,
-            'partner_id': wh.partner_id.id,
-            'operating_unit_id': OU.id})
-        return wh2
+                                             self.b2c)
 
     def _create_product(self, product):
         product2 = product.copy()
@@ -96,7 +81,7 @@ class TestSaleOperatingUnit(common.TransactionCase):
         })
         return user
 
-    def _create_sale_order(self, uid, customer, product, pricelist, warehouse,
+    def _create_sale_order(self, uid, customer, product, pricelist,
                            operating_unit):
         """Create a sale order."""
         sale = self.sale_model.create({
@@ -105,7 +90,6 @@ class TestSaleOperatingUnit(common.TransactionCase):
             'partner_shipping_id': customer.id,
             'pricelist_id': pricelist.id,
             'operating_unit_id': operating_unit.id,
-            'warehouse_id': warehouse.id
         })
         self.sale_order_model.create({
             'order_id': sale.id,
@@ -113,21 +97,6 @@ class TestSaleOperatingUnit(common.TransactionCase):
             'name': 'Sale Order Line'
         })
         return sale
-
-    def _confirm_sale(self, sale):
-        sale.action_confirm()
-        payment = self.payment_model.create({
-            'advance_payment_method': 'all'
-        })
-        sale_context = {
-            'active_id': sale.id,
-            'active_ids': sale.ids,
-            'active_model': 'sale.order',
-            'open_invoices': True,
-        }
-        res = sale.action_invoice_create()
-        invoice_id = res[0]
-        return invoice_id
 
     def test_security(self):
         """Test Sale Operating Unit"""
@@ -139,13 +108,11 @@ class TestSaleOperatingUnit(common.TransactionCase):
                                            self.ou1.id)])
         self.assertEqual(sale.ids, [], 'User 2 should not have access to '
                                        'OU %s' % self.ou1.name)
-        # Confirm Sale1
-        self._confirm_sale(self.sale1)
-        # Confirm Sale2
-        b2c_invoice_id = self._confirm_sale(self.sale2)
-        # Checks that invoice has OU b2c
-        b2c = self.acc_invoice_model.sudo(self.user2.id).search(
-                                         [('id', '=', b2c_invoice_id),
-                                          ('operating_unit_id', '=',
-                                           self.b2c.id)])
-        self.assertNotEqual(b2c.ids, [], 'Invoice should have b2c OU')
+
+        sale = self.sale_model.sudo(self.user2.id).search(
+            [('id', '=', self.sale2.id),
+             ('operating_unit_id', '=',
+              self.b2c.id)])
+
+        self.assertEqual(len(sale.ids), 1, 'User 1 should have access to '
+                                    'OU %s' % self.b2c.name)
