@@ -14,11 +14,10 @@
     "license": "LGPL-3",
     "website": "http://www.eficent.com",
     "category": "Sales Management",
-    "depends": ["sale", "operating_unit"],
+    "depends": ["sale", "operating_unit", "account_operating_unit"],
     "data": [
         "views/sale_view.xml",
         "security/sale_security.xml",
     ],
-    'installable': True,
-    'active': False,
+    'installable': True
 }
