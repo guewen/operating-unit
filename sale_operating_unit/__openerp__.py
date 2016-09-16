@@ -17,6 +17,7 @@
     "depends": ["sale", "operating_unit", "account_operating_unit"],
     "data": [
         "views/sale_view.xml",
+        "views/sale_report_view.xml",
         "security/sale_security.xml",
     ],
     'installable': True
