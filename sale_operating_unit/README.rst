@@ -16,18 +16,13 @@ Installation
 
 No additional installation instructions are required.
 
-Configuration
-=============
-
-Go to 'Settings / Technical / Actions / User-defined Defaults' and remove
-the default set for the Shop.
 
 Usage
 =====
 
 .. image:: https://odoo-community.org/website/image/ir.attachment/5784_f2813bd/datas
    :alt: Try me on Runbot
-   :target: https://runbot.odoo-community.org/runbot/213/7.0
+   :target: https://runbot.odoo-community.org/runbot/213/9.0
 
 Bug Tracker
 ===========
@@ -49,8 +44,9 @@ Images
 Contributors
 ------------
 
-* Eficent <contact@eficent.com>
-* Serpent Consulting Services Pvt. Ltd. <support@serpentcs.com>
+Jordi Ballester Alomar <jordi.ballester@eficent.com>
+Aaron Henriquez <aheficent@eficent.com>
+Sudhir Arya <sudhir.arya@serpentcs.com>
 
 Maintainer
 ----------
