@@ -86,9 +86,9 @@ class TestStockAccountOperatingUnit(common.TestStockCommon):
                                                               self.company)
         # Update company data
         company = self.env.ref('base.main_company')
-        company.write({'inter_ou_clearing_account_id':\
+        company.write({'inter_ou_clearing_account_id':
                        self.account_inter_ou_clearing.id,
-                                  'ou_is_self_balanced': True})
+                       'ou_is_self_balanced': True})
 #    Create Product
         self.product = self._create_product()
 #    Create incoming stock picking type
@@ -186,14 +186,14 @@ class TestStockAccountOperatingUnit(common.TestStockCommon):
         balance = self._get_balance(domain)
         if operating_unit:
             self.assertEqual(
-                    balance, expected_balance,
-                    'Balance is not %s for Operating Unit %s.'
-                    % (str(expected_balance), operating_unit.name))
+                balance, expected_balance,
+                'Balance is not %s for Operating Unit %s.'
+                % (str(expected_balance), operating_unit.name))
         else:
             self.assertEqual(
-                    balance, expected_balance,
-                    'Balance is not %s for all Operating Units.'
-                    % str(expected_balance)) \
+                balance, expected_balance,
+                'Balance is not %s for all Operating Units.'
+                % str(expected_balance)) \
 
 
     def _get_balance(self, domain):
@@ -215,8 +215,8 @@ class TestStockAccountOperatingUnit(common.TestStockCommon):
         # Create Incoming Shipment 1
         self.picking =\
         self._create_picking(self.user1.id, self.ou1.id, self.incoming_id,
-                                 self.supplier_location,
-                                 self.stock_location_stock)
+                             self.supplier_location,
+                             self.stock_location_stock)
         # Receive it
         self._confirm_receive(self.user1.id, self.picking)
         # GL account ‘Inventory’ has balance 1 irrespective of the OU

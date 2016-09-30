@@ -13,7 +13,6 @@
     "author": "Eficent Business and IT Consulting Services S.L., "
               "Serpent Consulting Services Pvt. Ltd.,"
               "Odoo Community Association (OCA)",
-    "website": "http://www.eficent.com",
     "license": "LGPL-3",
     "website": "http://www.eficent.com",
     "depends": [
