@@ -213,10 +213,9 @@ class TestStockAccountOperatingUnit(common.TestStockCommon):
         operating unit, then into b2c operating unit, and then transfer stock
         from main ou to b2c."""
         # Create Incoming Shipment 1
-        self.picking =\
-        self._create_picking(self.user1.id, self.ou1.id, self.incoming_id,
-                             self.supplier_location,
-                             self.stock_location_stock)
+        self.picking = self._create_picking(
+            self.user1.id, self.ou1.id, self.incoming_id,
+            self.supplier_location, self.stock_location_stock)
         # Receive it
         self._confirm_receive(self.user1.id, self.picking)
         # GL account ‘Inventory’ has balance 1 irrespective of the OU

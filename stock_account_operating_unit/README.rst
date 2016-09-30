@@ -26,7 +26,7 @@ be self-balanced, and then indicate a self-balancing clearing account.
 * Go to *Settings / Companies / Configuration* and:
    ** Set the "Operating Units are self-balanced" checkbox
    ** Set the "Inter-OU Clearing"  account in "Inter-operating unit clearing
-account" field.
+      account" field.
 * Assign Operating Unit in Accounts.
 
 

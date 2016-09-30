@@ -27,8 +27,8 @@ class StockQuant(models.Model):
             debit_line_vals['account_id'] != credit_line_vals['account_id']
         ):
             raise ValidationError(_('You cannot create stock moves involving '
-                            'separate source and destination accounts '
-                            'related to different operating units.'))
+                                    'separate source and destination accounts'
+                                    ' related to different operating units.'))
 
         debit_line_vals['operating_unit_id'] = \
             move.operating_unit_dest_id.id or move.operating_unit_id.id
@@ -66,9 +66,10 @@ class StockQuant(models.Model):
                     err = True
                 if err:
                     raise ValidationError(_('Transfers between locations of '
-                                    'different operating unit locations is '
-                                    'only allowed when both source and '
-                                    'destination locations are internal.'))
+                                            'different operating unit '
+                                            'locations is only allowed when '
+                                            'both source and destination '
+                                            'locations are internal.'))
                 src_company_ctx = dict(
                     force_company=move.location_id.company_id.id
                 )
