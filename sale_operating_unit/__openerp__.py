@@ -14,7 +14,7 @@
     "license": "LGPL-3",
     "website": "http://www.eficent.com",
     "category": "Sales Management",
-    "depends": ["sale", "operating_unit", "account_operating_unit"],
+    "depends": ["sale", "account_operating_unit", "sales_team_operating_unit"],
     "data": [
         "views/sale_view.xml",
         "views/sale_report_view.xml",
