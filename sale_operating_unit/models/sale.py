@@ -16,21 +16,6 @@ class SaleOrder(models.Model):
                                         self.env['res.users'].
                                         operating_unit_default_get(self._uid))
 
-    @api.onchange('team_id')
-    def onchange_team_id(self):
-        self.operating_unit_id = self.team_id.operating_unit_id
-
-    @api.multi
-    @api.constrains('team_id', 'operating_unit_id')
-    def _check_team_operating_unit(self):
-        for rec in self:
-            if rec.team_id and rec.team_id.operating_unit_id != \
-                    rec.operating_unit_id:
-                raise ValidationError(_('Configuration error!\n'
-                                        'The Operating Unit of the sales team '
-                                        'must match with that of the '
-                                        'quote/sales order'))
-
     @api.multi
     @api.constrains('operating_unit_id', 'company_id')
     def _check_company_operating_unit(self):
