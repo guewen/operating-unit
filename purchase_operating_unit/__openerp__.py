@@ -6,8 +6,8 @@
 
 {
     "name": "Operating Unit in Purchase Orders",
-    "summary": "An operating unit (OU) is an organizational entity part of a\
-        company",
+    "summary": "An operating unit (OU) is an organizational entity part of a "
+               "company",
     "version": "9.0.1.0.0",
     "author": "Eficent Business and IT Consulting Services S.L., "
               "Serpent Consulting Services Pvt. Ltd.,"
