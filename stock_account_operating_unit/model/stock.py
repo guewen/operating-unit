@@ -3,9 +3,7 @@
 # - Jordi Ballester Alomar
 # © 2015 Serpent Consulting Services Pvt. Ltd. - Sudhir Arya
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
-from openerp import api, models
-from openerp.tools.translate import _
-from openerp.exceptions import ValidationError
+from openerp import _, api, exceptions, models
 
 
 class StockQuant(models.Model):
@@ -14,9 +12,9 @@ class StockQuant(models.Model):
     @api.model
     def _prepare_account_move_line(self, move, qty, cost, credit_account_id,
                                    debit_account_id):
-        res = super(StockQuant, self).\
-            _prepare_account_move_line(move, qty, cost, credit_account_id,
-                                       debit_account_id)
+        res = super(StockQuant, self)._prepare_account_move_line(
+            move, qty, cost, credit_account_id, debit_account_id
+        )
 
         debit_line_vals = res[0][2]
         credit_line_vals = res[1][2]
@@ -26,14 +24,18 @@ class StockQuant(models.Model):
             move.operating_unit_id != move.operating_unit_dest_id and
             debit_line_vals['account_id'] != credit_line_vals['account_id']
         ):
-            raise ValidationError(_('You cannot create stock moves involving '
-                                    'separate source and destination accounts'
-                                    ' related to different operating units.'))
+            raise exceptions.UserError(
+                _('You cannot create stock moves involving separate source '
+                  'and destination accounts related to different operating '
+                  'units.')
+            )
 
-        debit_line_vals['operating_unit_id'] = \
+        debit_line_vals['operating_unit_id'] = (
             move.operating_unit_dest_id.id or move.operating_unit_id.id
-        credit_line_vals['operating_unit_id'] = \
+        )
+        credit_line_vals['operating_unit_id'] = (
             move.operating_unit_id.id or move.operating_unit_dest_id.id
+        )
         return [(0, 0, debit_line_vals), (0, 0, credit_line_vals)]
 
     @api.model
@@ -55,28 +57,28 @@ class StockQuant(models.Model):
                     move.operating_unit_id != move.operating_unit_dest_id
             ):
                 err = False
-                if move.location_id.usage != 'internal' \
-                        and move.location_dest_id.usage == 'internal':
+                if (move.location_id.usage != 'internal'
+                        and move.location_dest_id.usage == 'internal'):
                     err = True
-                if move.location_id.usage != 'internal' \
-                        and move.location_dest_id.usage == 'internal':
+                if (move.location_id.usage == 'internal'
+                        and move.location_dest_id.usage != 'internal'):
                     err = True
-                if move.location_id.usage != 'internal' \
-                        and move.location_dest_id.usage != 'internal':
+                if (move.location_id.usage != 'internal'
+                        and move.location_dest_id.usage != 'internal'):
                     err = True
                 if err:
-                    raise ValidationError(_('Transfers between locations of '
-                                            'different operating unit '
-                                            'locations is only allowed when '
-                                            'both source and destination '
-                                            'locations are internal.'))
+                    raise exceptions.UserError(
+                        _('Transfers between locations of different operating '
+                          'unit locations is only allowed when both source '
+                          'and destination locations are internal.')
+                    )
                 src_company_ctx = dict(
                     force_company=move.location_id.company_id.id
                 )
                 company_ctx = dict(company_id=move.company_id.id)
-                journal_id, acc_src, acc_dest, acc_valuation = \
-                    self.with_context(src_company_ctx).\
-                    _get_accounting_data_for_valuation(move)
+                self_c = self.with_context(src_company_ctx)
+                data = self_c._get_accounting_data_for_valuation(move)
+                (journal_id, acc_src, acc_dest, acc_valuation) = data
                 quant_cost_qty = {}
                 for quant in quants:
                     if quant_cost_qty.get(quant.cost):
